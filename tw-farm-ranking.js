@@ -165,8 +165,22 @@
 
   // ===================== logika glowna =====================
 
-  // generate(tag) -> Promise<{ bbcode, warnings }>
-  function generate(tag, onProgress) {
+  // Sortowanie farmiacych: 'ratio' = wg stosunku surowce/punkty (0 pkt na koniec),
+  // w przeciwnym razie wg zrabowanych surowcow (malejaco).
+  function sortFarmers(rows, sortBy) {
+    if (sortBy === 'ratio') {
+      rows.sort(function (a, b) {
+        var ra = (a.points > 0) ? a.wynik / a.points : -1;
+        var rb = (b.points > 0) ? b.wynik / b.points : -1;
+        return rb - ra;
+      });
+    } else {
+      rows.sort(function (a, b) { return b.wynik - a.wynik; });
+    }
+  }
+
+  // generate(tag, onProgress, sortBy) -> Promise<{ bbcode, warnings }>
+  function generate(tag, onProgress, sortBy) {
     tag = String(tag || '').trim();
     if (!tag) return Promise.reject(new Error('Pusty tag plemienia.'));
     var ally, members, farmers = [], warnings = [];
@@ -207,7 +221,7 @@
           if (r && r.error) { f.villages = null; warnings.push('Wioski: nie pobrano dla ' + f.name); }
           else { f.villages = r ? r.wynik : 0; }
         });
-        farmers.sort(function (a, b) { return b.wynik - a.wynik; });
+        sortFarmers(farmers, sortBy);
         return { bbcode: buildBBCode(tag, farmers), warnings: warnings };
       });
   }
@@ -252,11 +266,16 @@
   function setStatus(html) { var s = document.getElementById('twfr-status'); if (s) s.innerHTML = html; }
 
   function openUI() {
-    var last = '';
-    try { last = localStorage.getItem(CFG.lsKey) || ''; } catch (e) {}
+    var last = '', lastSort = 'res';
+    try { last = localStorage.getItem(CFG.lsKey) || ''; lastSort = localStorage.getItem(CFG.lsKey + '_sort') || 'res'; } catch (e) {}
     var box = modal(
       '<h3 style="margin:0 0 10px">Ranking farmy → BBCode</h3>' +
       '<label>Tag plemienia:<br><input id="twfr-tag" type="text" value="' + escapeAttr(last) + '" style="width:220px;padding:5px;margin-top:4px;border:1px solid #804000;border-radius:3px"></label>' +
+      '<div style="margin-top:10px"><label>Sortuj wg:<br>' +
+      '<select id="twfr-sort" style="margin-top:4px;padding:4px;border:1px solid #804000;border-radius:3px">' +
+      '<option value="res"' + (lastSort === 'res' ? ' selected' : '') + '>Zrabowane surowce</option>' +
+      '<option value="ratio"' + (lastSort === 'ratio' ? ' selected' : '') + '>Stosunek farma/pkt</option>' +
+      '</select></label></div>' +
       '<div style="margin-top:12px"><button id="twfr-go" class="btn">Generuj</button> &nbsp;<button id="twfr-cancel" class="btn">Anuluj</button></div>' +
       '<div id="twfr-status" style="margin-top:12px;min-height:20px"></div>'
     );
@@ -265,20 +284,21 @@
     box.querySelector('#twfr-cancel').onclick = closeModal;
     var go = function () {
       var tag = tagInput.value.trim();
+      var sortBy = box.querySelector('#twfr-sort').value;
       if (!tag) { setStatus('Podaj tag plemienia.'); return; }
-      try { localStorage.setItem(CFG.lsKey, tag); } catch (e) {}
+      try { localStorage.setItem(CFG.lsKey, tag); localStorage.setItem(CFG.lsKey + '_sort', sortBy); } catch (e) {}
       box.querySelector('#twfr-go').disabled = true;
-      runUI(tag);
+      runUI(tag, sortBy);
     };
     box.querySelector('#twfr-go').onclick = go;
     tagInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') go(); });
   }
 
-  function runUI(tag) {
+  function runUI(tag, sortBy) {
     setStatus('Pobieram dane…');
     generate(tag, function (d, t, phase) {
       setStatus('[' + phase + '] ' + d + ' / ' + t + ' graczy…');
-    }).then(function (out) { showResult(out.bbcode, out.warnings); }).catch(function (err) {
+    }, sortBy).then(function (out) { showResult(out.bbcode, out.warnings); }).catch(function (err) {
       setStatus('<b style="color:#a00">Blad:</b> ' + escapeHtml((err && err.message) || String(err)) +
         '<br><button id="twfr-go" class="btn" style="margin-top:8px">Sprobuj ponownie</button>');
       var b = document.getElementById('twfr-go'); if (b) b.onclick = openUI;
@@ -314,7 +334,7 @@
     generate: generate,
     buildBBCode: buildBBCode,
     open: openUI,
-    _internal: { findAlly: findAlly, membersOf: membersOf, extractRow: extractRow, groupDot: groupDot, toInt: toInt, decodeField: decodeField }
+    _internal: { findAlly: findAlly, membersOf: membersOf, extractRow: extractRow, groupDot: groupDot, toInt: toInt, decodeField: decodeField, sortFarmers: sortFarmers, ratio: ratio }
   };
 
   openUI();
