@@ -13,12 +13,14 @@ Plik: [`tw-farm-ranking.js`](tw-farm-ranking.js)
 [spoiler=TRN]
 [b]Ranking farmy TRN — aktualny na dzien 07.06.2026[/b]
 [table]
-[**]LP[||]Ranking[||]Gracz[||]Plemie[||]Wynik[||]Spladrowane wioski[||]Punkty[||]Stosunek farma/pkt[||]Data
-[*]1[|]1[|]TopornyPikinier[|]TRN[|]1.657.125[|]14.911[|]40.707[|]40,7[|]wczoraj
-...
+[**] LP [||] Ranking [||] Gracz [||] Plemie [||] Wynik [||] Spladrowane wioski [||] Punkty [||] Stosunek farma/pkt [||] Data [/**][*] [b]1[/b] [|] 1 [|] [player]TopornyPikinier[/player] [|] [ally]TRN[/ally] [|] [b]1.657.125[/b] [|] 14.911 [|] 40.707 [|] 40,7 [|] wczoraj[*] ...
 [/table]
 [/spoiler]
 ```
+
+> **Składnia tabeli forum Plemion** (istotne): nagłówek to `[**] … [||] … [/**]` — **musi być
+> zamknięty `[/**]`** (bez tego wiersze wpadają do ostatniej komórki). Wiersze danych: `[*] … [|] … `
+> (komórki przez **pojedynczy** `[|]`). Linki: `[player]nick[/player]`, `[ally]TAG[/ally]`.
 
 - Kolumny: `LP | Ranking (globalna pozycja) | Gracz | Plemię | Wynik (zrabowane surowce) |
   Splądrowane wioski | Punkty | Stosunek farma/pkt | Data`.

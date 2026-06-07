@@ -97,13 +97,17 @@ Kolumna **Stosunek farma/pkt** = `Wynik ÷ Punkty` (1 miejsce po przecinku, prze
 
 **Spoiler:** całość (nagłówek + tabela) owinięta w `[spoiler=<TAG>]…[/spoiler]`; tytuł = tag plemienia.
 
+**Składnia tabeli (potwierdzona na działającym poście forum):**
+- nagłówek: `[**] cela [||] cela … [/**]` — komórki przez `[||]`, wiersz **zamknięty** `[/**]`
+  (bez `[/**]` parser wciąga wszystkie wiersze do ostatniej komórki — błąd renderowania).
+- wiersze: `[*] cela [|] cela …` — komórki przez **pojedynczy** `[|]`, wiersz zaczyna `[*]`.
+- linki: `[player]nick[/player]`, `[ally]TAG[/ally]`; LP i Wynik pogrubione `[b]…[/b]`.
+
 ```
 [spoiler=TRN]
 [b]Ranking farmy TRN — aktualny na dzień 07.06.2026[/b]
 [table]
-[**]LP[||]Ranking[||]Gracz[||]Plemię[||]Wynik[||]Splądrowane wioski[||]Punkty[||]Stosunek farma/pkt[||]Data
-[*]1[|]7[|]Bumbalabumba[|]TRN[|]646.447[|]214[|]12.345[|]52,4[|]24.05.2026
-[*]2[|]9[|]Shiere00[|]TRN[|]551.511[|]188[|]11.030[|]50,0[|]27.05.2026
+[**] LP [||] Ranking [||] Gracz [||] Plemię [||] Wynik [||] Splądrowane wioski [||] Punkty [||] Stosunek farma/pkt [||] Data [/**][*] [b]1[/b] [|] 1 [|] [player]TopornyPikinier[/player] [|] [ally]TRN[/ally] [|] [b]1.657.125[/b] [|] 14.911 [|] 40.707 [|] 40,7 [|] wczoraj[*] [b]2[/b] [|] 4 [|] [player]Bumbalabumba[/player] [|] [ally]TRN[/ally] [|] [b]1.419.440[/b] [|] 19.540 [|] 34.521 [|] 41,1 [|] wczoraj
 [/table]
 [/spoiler]
 ```

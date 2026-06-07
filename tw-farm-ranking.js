@@ -212,21 +212,25 @@
       });
   }
 
+  // Skladnia tabeli forum Plemion (potwierdzona na dzialajacym poscie):
+  // - naglowek: [**] cela [||] cela ... [/**]  (komorki przez [||], wiersz ZAMKNIETY [/**])
+  // - wiersze: [*] cela [|] cela ...           (komorki przez [|], wiersz zaczyna [*])
+  // - [player]nick[/player], [ally]TAG[/ally] -> klikalne linki gracza/plemienia
   function buildBBCode(tag, rows) {
     var head = '[b]Ranking farmy ' + tag + ' — aktualny na dzien ' + todayPl() + '[/b]';
-    var header = '[**]LP[||]Ranking[||]Gracz[||]Plemie[||]Wynik[||]Spladrowane wioski[||]Punkty[||]Stosunek farma/pkt[||]Data';
+    var header = '[**] LP [||] Ranking [||] Gracz [||] Plemie [||] Wynik [||] Spladrowane wioski [||] Punkty [||] Stosunek farma/pkt [||] Data [/**]';
     var body = rows.map(function (r, i) {
-      return '[*]' + (i + 1) +
-        '[|]' + groupDot(r.ranking) +
-        '[|]' + r.name +
-        '[|]' + (r.tribe || tag) +
-        '[|]' + groupDot(r.wynik) +
-        '[|]' + (r.villages == null ? '?' : groupDot(r.villages)) +
-        '[|]' + groupDot(r.points || 0) +
-        '[|]' + ratio(r.wynik, r.points || 0) +
-        '[|]' + (r.data || '');
-    }).join('\n');
-    return '[spoiler=' + tag + ']\n' + head + '\n[table]\n' + header + '\n' + body + '\n[/table]\n[/spoiler]';
+      return '[*] [b]' + (i + 1) + '[/b]' +
+        ' [|] ' + groupDot(r.ranking) +
+        ' [|] [player]' + r.name + '[/player]' +
+        ' [|] [ally]' + (r.tribe || tag) + '[/ally]' +
+        ' [|] [b]' + groupDot(r.wynik) + '[/b]' +
+        ' [|] ' + (r.villages == null ? '?' : groupDot(r.villages)) +
+        ' [|] ' + groupDot(r.points || 0) +
+        ' [|] ' + ratio(r.wynik, r.points || 0) +
+        ' [|] ' + (r.data || '');
+    }).join('');
+    return '[spoiler=' + tag + ']\n' + head + '\n[table]\n' + header + body + '\n[/table]\n[/spoiler]';
   }
 
   // ===================== UI =====================
