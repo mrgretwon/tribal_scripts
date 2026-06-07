@@ -25,9 +25,12 @@ surowce), Data. Dodajemy: **Splądrowane wioski** oraz **Punkty**.
 
 ## 2. Wejście
 
-- Skrót plemienia podawany w **okienku** po uruchomieniu (pole tekstowe; podpowiadany ostatnio użyty
+- Skrót plemienia — lub **kilka tagów po przecinku** (np. `TRN, TRN-`); członkowie łączeni i
+  deduplikowani po nazwie, kolumna „Plemię" pokazuje faktyczne plemię gracza, nieznalezione tagi →
+  ostrzeżenie. Podawane w **okienku** po uruchomieniu (pole tekstowe; podpowiadany ostatnio użyty
   tag z `localStorage`).
-- Dopasowanie plemienia: **dokładny tag** (warianty typu `TRN-` nie są uwzględniane).
+- Dopasowanie plemienia: **dokładny tag** (warianty typu `TRN-` nie są dołączane automatycznie —
+  można je dopisać jawnie po przecinku).
 - Skrypt działa na origin, na którym jest uruchomiony (URL-e względne), więc jest przenośny między
   światami; rozwijany/testowany na `pl228`.
 
@@ -136,7 +139,7 @@ Kolumna **Stosunek farma/pkt** = `Wynik ÷ Punkty` (1 miejsce po przecinku, prze
 
 - Automatyczne publikowanie/edycja postu na forum.
 - Inne tryby (tygodniowy/miesięczny) i typy rankingu (kill_*, conquer).
-- Warianty tagu (TRN-, akademie) i wiele plemion naraz.
+- Automatyczne dołączanie wariantów tagu (TRN- itp.) bez ich jawnego podania.
 - Hosting pliku (robi to użytkownik) i konfiguracja quickbara.
 - Cache / historia / harmonogram.
 

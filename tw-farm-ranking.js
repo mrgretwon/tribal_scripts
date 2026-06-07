@@ -186,17 +186,29 @@
   }
 
   // generate(tag, onProgress, sortBy) -> Promise<{ bbcode, warnings }>
-  function generate(tag, onProgress, sortBy) {
-    tag = String(tag || '').trim();
-    if (!tag) return Promise.reject(new Error('Pusty tag plemienia.'));
-    var ally, members, farmers = [], warnings = [];
+  function generate(tagInput, onProgress, sortBy) {
+    var tags = String(tagInput || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+    if (!tags.length) return Promise.reject(new Error('Podaj tag(i) plemienia.'));
+    var members, farmers = [], warnings = [], title = tags.join(', ');
 
     return Promise.all([getText('/map/ally.txt'), getText('/map/player.txt')])
       .then(function (res) {
-        ally = findAlly(res[0], tag);
-        if (!ally) throw new Error('Nie znaleziono plemienia o tagu "' + tag + '".');
-        members = membersOf(res[1], ally.id);
-        if (!members.length) throw new Error('Plemie "' + tag + '" nie ma czlonkow w eksporcie.');
+        var allyTxt = res[0], playerTxt = res[1], seen = {}, usedTags = [], notFound = [];
+        members = [];
+        tags.forEach(function (tg) {
+          var ally = findAlly(allyTxt, tg);
+          if (!ally) { notFound.push(tg); return; }
+          usedTags.push(ally.tag);
+          membersOf(playerTxt, ally.id).forEach(function (m) {
+            var k = m.name.toLowerCase();
+            if (seen[k]) return;               // dedup po nazwie (gracz jest w 1 plemieniu)
+            seen[k] = 1; m.srcTag = ally.tag; members.push(m);
+          });
+        });
+        notFound.forEach(function (t) { warnings.push('Nie znaleziono plemienia: ' + t); });
+        if (!usedTags.length) throw new Error('Nie znaleziono zadnego z plemion: ' + tags.join(', ') + '.');
+        if (!members.length) throw new Error('Podane plemiona nie maja czlonkow w eksporcie.');
+        title = usedTags.join(', ');
 
         if (onProgress) onProgress(0, members.length, 'Zrabowane surowce');
         return pool(members, function (m) {
@@ -211,10 +223,10 @@
           var r = resRows[i];
           if (r && r.error) { warnings.push('Surowce: nie pobrano dla ' + m.name); return; }
           if (r && r.wynik > 0) {
-            farmers.push({ name: m.name, points: m.points, ranking: r.ranking, wynik: r.wynik, data: r.data, tribe: r.tribe || tag, villages: 0 });
+            farmers.push({ name: m.name, points: m.points, ranking: r.ranking, wynik: r.wynik, data: r.data, tribe: r.tribe || m.srcTag, villages: 0 });
           }
         });
-        if (!farmers.length) throw new Error('Zaden czlonek plemienia "' + tag + '" nie ma dzis rekordu farmy.');
+        if (!farmers.length) throw new Error('Zaden czlonek (' + title + ') nie ma dzis rekordu farmy.');
 
         if (onProgress) onProgress(0, farmers.length, 'Spladrowane wioski');
         return pool(farmers, function (f) {
@@ -228,7 +240,7 @@
           else { f.villages = r ? r.wynik : 0; }
         });
         sortFarmers(farmers, sortBy);
-        return { bbcode: buildBBCode(tag, farmers), warnings: warnings };
+        return { bbcode: buildBBCode(title, farmers), warnings: warnings };
       });
   }
 
@@ -236,21 +248,21 @@
   // - naglowek: [**] cela [||] cela ... [/**]  (komorki przez [||], wiersz ZAMKNIETY [/**])
   // - wiersze: [*] cela [|] cela ...           (komorki przez [|], wiersz zaczyna [*])
   // - [player]nick[/player], [ally]TAG[/ally] -> klikalne linki gracza/plemienia
-  function buildBBCode(tag, rows) {
-    var head = '[b]Ranking farmy ' + tag + ' — aktualny na dzien ' + todayPl() + '[/b]';
+  function buildBBCode(title, rows) {
+    var head = '[b]Ranking farmy ' + title + ' — aktualny na dzien ' + todayPl() + '[/b]';
     var header = '[**] LP [||] Ranking [||] Gracz [||] Plemie [||] Wynik [||] Spladrowane wioski [||] Punkty [||] Stosunek farma/pkt [||] Data [/**]';
     var body = rows.map(function (r, i) {
       return '[*] [b]' + (i + 1) + '[/b]' +
         ' [|] ' + groupDot(r.ranking) +
         ' [|] [player]' + r.name + '[/player]' +
-        ' [|] [ally]' + (r.tribe || tag) + '[/ally]' +
+        ' [|] ' + (r.tribe ? '[ally]' + r.tribe + '[/ally]' : '') +
         ' [|] [b]' + groupDot(r.wynik) + '[/b]' +
         ' [|] ' + (r.villages == null ? '?' : groupDot(r.villages)) +
         ' [|] ' + groupDot(r.points || 0) +
         ' [|] ' + ratio(r.wynik, r.points || 0) +
         ' [|] ' + (r.data || '');
     }).join('');
-    return '[spoiler=' + tag + ']\n' + head + '\n[table]\n' + header + body + '\n[/table]\n[/spoiler]';
+    return '[spoiler=' + title + ']\n' + head + '\n[table]\n' + header + body + '\n[/table]\n[/spoiler]';
   }
 
   // ===================== UI =====================
@@ -276,7 +288,7 @@
     try { last = localStorage.getItem(CFG.lsKey) || ''; lastSort = localStorage.getItem(CFG.lsKey + '_sort') || 'res'; } catch (e) {}
     var box = modal(
       '<h3 style="margin:0 0 10px">Ranking farmy → BBCode</h3>' +
-      '<label>Tag plemienia:<br><input id="twfr-tag" type="text" value="' + escapeAttr(last) + '" style="width:220px;padding:5px;margin-top:4px;border:1px solid #804000;border-radius:3px"></label>' +
+      '<label>Tag(i) plemienia <span style="color:#806000">(kilka po przecinku, np. TRN, TRN-)</span>:<br><input id="twfr-tag" type="text" value="' + escapeAttr(last) + '" style="width:300px;padding:5px;margin-top:4px;border:1px solid #804000;border-radius:3px"></label>' +
       '<div style="margin-top:10px"><label>Sortuj wg:<br>' +
       '<select id="twfr-sort" style="margin-top:4px;padding:4px;border:1px solid #804000;border-radius:3px">' +
       '<option value="res"' + (lastSort === 'res' ? ' selected' : '') + '>Zrabowane surowce</option>' +

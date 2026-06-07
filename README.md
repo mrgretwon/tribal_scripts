@@ -27,7 +27,9 @@ Plik: [`tw-farm-ranking.js`](tw-farm-ranking.js)
 - „Stosunek farma/pkt" = zrabowane surowce ÷ punkty (1 miejsce po przecinku; `—` gdy brak punktów).
 - Sortowanie malejąco — do wyboru w okienku: **zrabowane surowce** (domyślnie),
   **splądrowane wioski** lub **stosunek farma/pkt**; separator tysięcy = kropka.
-- Uwzględnia tylko członków o **dokładnym tagu**; niefarmiących (brak rekordu) pomija.
+- Obsługuje **wiele plemion naraz** (tagi po przecinku, np. `TRN, TRN-`); dopasowanie po
+  **dokładnym tagu**, członkowie łączeni i deduplikowani, a kolumna „Plemię" pokazuje faktyczne
+  plemię gracza. Niefarmiących (brak rekordu) pomija; nieznalezione tagi → ostrzeżenie.
 
 ## Wdrożenie
 
@@ -56,8 +58,9 @@ Repo: <https://github.com/mrgretwon/tribal_scripts>
 ## Użycie
 
 1. Kliknij przycisk w pasku skrótów (będąc zalogowanym w dowolnym ekranie gry).
-2. Wpisz tag plemienia (ostatni jest zapamiętywany), wybierz **sortowanie** (Zrabowane surowce /
-   Splądrowane wioski / Stosunek farma/pkt — też zapamiętywane) i kliknij **Generuj**.
+2. Wpisz tag plemienia — lub **kilka po przecinku** (np. `TRN, TRN-`); ostatni wpis jest
+   zapamiętywany. Wybierz **sortowanie** (Zrabowane surowce / Splądrowane wioski /
+   Stosunek farma/pkt — też zapamiętywane) i kliknij **Generuj**.
 3. Poczekaj — pasek postępu pokazuje zbieranie danych (dwie fazy: surowce, wioski).
 4. W oknie wyniku kliknij **Kopiuj do schowka** i wklej na forum.
 
