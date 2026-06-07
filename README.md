@@ -34,22 +34,23 @@ Repo: <https://github.com/mrgretwon/tribal_scripts>
 
 1. **Hosting pliku.** Quickbar ładuje skrypt przez `$.getScript`, a przeglądarka wykona go tylko,
    gdy serwer poda poprawny typ `application/javascript`. Dlatego:
-   - **jsDelivr — zalecane (działa od razu po push, bez konfiguracji):**
-     `https://cdn.jsdelivr.net/gh/mrgretwon/tribal_scripts@main/tw-farm-ranking.js`
-   - **albo GitHub Pages** (włącz w *Settings → Pages*):
+   - **GitHub Pages — zalecane** (włączone w *Settings → Pages*, źródło: gałąź `main`, `/root`):
      `https://mrgretwon.github.io/tribal_scripts/tw-farm-ranking.js`
+     Przy każdym `push` przebudowuje się automatycznie; cache CDN tylko ~10 min.
+   - **jsDelivr — zapas** (CDN ciągnący z repo):
+     `https://cdn.jsdelivr.net/gh/mrgretwon/tribal_scripts@main/tw-farm-ranking.js`
+     Cache `@main` do ~12 h — po zmianie wyczyść: `https://purge.jsdelivr.net/gh/mrgretwon/tribal_scripts@main/tw-farm-ranking.js`.
    - **NIE** używaj `raw.githubusercontent.com` — wysyła `nosniff`/`text/plain`, więc skrypt się nie wykona.
 2. **Dodaj przycisk do paska skrótów** (*Ustawienia → Pasek skrótów*,
    `game.php?screen=settings&mode=quickbar_edit`) z adresem:
    ```
-   javascript:$.getScript('https://cdn.jsdelivr.net/gh/mrgretwon/tribal_scripts@main/tw-farm-ranking.js');void(0);
+   javascript:$.getScript('https://mrgretwon.github.io/tribal_scripts/tw-farm-ranking.js');void(0);
    ```
    Nazwij go np. „Ranking farmy".
 3. Gotowe — kliknięcie przycisku otwiera okienko skryptu.
 
-> **Cache jsDelivr:** `@main` jest cache'owane (do ~12 h). Po aktualizacji skryptu użyj URL z
-> konkretnym commitem/tagiem albo wyczyść cache, otwierając raz:
-> `https://purge.jsdelivr.net/gh/mrgretwon/tribal_scripts@main/tw-farm-ranking.js`.
+> Oba hostingi serwują `application/javascript` i przechodzą CSP świata `pl228`
+> (zweryfikowane na żywo przez `$.getScript`).
 
 ## Użycie
 
