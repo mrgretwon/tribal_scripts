@@ -73,8 +73,9 @@ surowce), Data. Dodajemy: **Splądrowane wioski** oraz **Punkty**.
 4. Dla każdego członka `GET ...type=loot_res&name=` → `{ranking, wynik, data}`.
    - Brak dokładnego wiersza = brak rekordu → **pomiń** (niefarmiących nie pokazujemy).
 5. Dla pozostałych `GET ...type=loot_vil&name=` → `splądrowane wioski`.
-6. Połącz po nazwie; posortuj malejąco wg **zrabowanych surowców** (domyślnie) **lub wg stosunku
-   farma/pkt** (opcja w UI, 0 pkt na końcu); nadaj `LP` 1..N.
+6. Połącz po nazwie; posortuj malejąco — opcja w UI: **zrabowane surowce** (domyślnie),
+   **splądrowane wioski** (nieudane `?` na końcu) lub **stosunek farma/pkt** (0 pkt na końcu);
+   nadaj `LP` 1..N.
 7. Złóż BBCode i pokaż w oknie wyjścia z przyciskiem „Kopiuj".
 
 ## 6. UI
